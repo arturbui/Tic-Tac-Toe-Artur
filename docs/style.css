@@ -1,0 +1,49 @@
+body{
+background-image: url("./WindowsXP.jpg");
+    background-size:cover;
+}
+
+.grid{
+    display: grid;
+    grid-template-columns: 10rem 10rem 10rem;
+    justify-content: center;
+}
+
+
+.box{
+
+    text-align: center;
+    height:10rem;
+
+}
+
+.size{
+    width: 100%;
+    height: 100%;
+    opacity:90%;
+    background-color: white;
+    border-color: skyblue;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s ease-in-out;
+}
+
+.hovering{
+    font-style: normal;
+    font-size:7.5rem ;
+    opacity: 0;
+
+}
+
+.size:hover{
+    .hovering{
+        opacity: 50;
+    }
+}
+
+.reset{
+    background-color: black;
+    color: white;
+    border-color: whitesmoke;
+}
+

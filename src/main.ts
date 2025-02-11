@@ -34,6 +34,7 @@ const handleMove = (index: number, button: HTMLButtonElement) => {
 
     board[index] = currentPlayer;
     button.textContent = currentPlayer;
+    button.classList.remove("hover-x", "hover-o"); // Remove hover class after move
 
     setTimeout(checkWinner, 50);
 
@@ -43,39 +44,7 @@ const handleMove = (index: number, button: HTMLButtonElement) => {
     }
 };
 
-boxes.forEach((box, index) => {
-    box.addEventListener("click", () => handleMove(index, box));
-});
-
-const resetGame = () => {
-    board = Array(9).fill("");
-    gameActive = true;
-    currentPlayer = "X";
-
-    boxes.forEach((box) => {
-        box.textContent = "";
-    });
-
-    if (turnDisplay) turnDisplay.textContent = `Current Player: ${currentPlayer}`;
-};
-
-reset?.addEventListener("click", resetGame);
-
-const handleMove = (index: number, button: HTMLButtonElement) => {
-    if (!gameActive || board[index] !== "") return;
-
-    board[index] = currentPlayer;
-    button.textContent = currentPlayer;
-    button.classList.remove("hover-x", "hover-o");
-
-    setTimeout(checkWinner, 50);
-
-    if (gameActive) {
-        currentPlayer = currentPlayer === "X" ? "O" : "X";
-        if (turnDisplay) turnDisplay.textContent = `Current Player: ${currentPlayer}`;
-    }
-};
-
+// Hover effect for previewing the next move
 boxes.forEach((box, index) => {
     box.addEventListener("click", () => handleMove(index, box));
 
@@ -89,3 +58,18 @@ boxes.forEach((box, index) => {
         box.classList.remove("hover-x", "hover-o");
     });
 });
+
+const resetGame = () => {
+    board = Array(9).fill("");
+    gameActive = true;
+    currentPlayer = "X";
+
+    boxes.forEach((box) => {
+        box.textContent = "";
+        box.classList.remove("hover-x", "hover-o"); // Clear hover effects
+    });
+
+    if (turnDisplay) turnDisplay.textContent = `Current Player: ${currentPlayer}`;
+};
+
+reset?.addEventListener("click", resetGame);
