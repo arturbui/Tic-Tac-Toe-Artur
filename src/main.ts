@@ -77,7 +77,6 @@ boxes.forEach((box, index) => {
         }
     });
 
-    // Remove hover effect when mouse leaves
     box.addEventListener("mouseleave", () => {
         if (!board[index]) {
             box.textContent = "";
@@ -85,7 +84,7 @@ boxes.forEach((box, index) => {
         }
     });
 
-    // Handle Click Event
+
     box.addEventListener("click", () => handleMove(index, box));
 });
 
