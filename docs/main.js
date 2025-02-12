@@ -4,7 +4,26 @@ const reset = document.querySelector(".reset");
 let currentPlayer = "X";
 let gameActive = true;
 let board = Array(9).fill("");
-if (turnDisplay) turnDisplay.textContent = `Current Player: ${currentPlayer}`;
+const loadGame = () => {
+  const savedState = localStorage.getItem("ticTacToeGame");
+  if (savedState) {
+    const { savedBoard, savedPlayer, savedGameActive } = JSON.parse(savedState);
+    board = savedBoard;
+    currentPlayer = savedPlayer;
+    gameActive = savedGameActive;
+    board.forEach((mark, index) => {
+      boxes[index].textContent = mark;
+    });
+    if (turnDisplay) turnDisplay.textContent = `Current Player: ${currentPlayer}`;
+  }
+};
+const saveGame = () => {
+  localStorage.setItem("ticTacToeGame", JSON.stringify({
+    savedBoard: board,
+    savedPlayer: currentPlayer,
+    savedGameActive: gameActive
+  }));
+};
 const winningComb = [
   [0, 1, 2],
   [3, 4, 5],
@@ -20,35 +39,41 @@ const checkWinner = () => {
     if (board[a] && board[a] === board[b] && board[a] === board[c]) {
       gameActive = false;
       if (turnDisplay) turnDisplay.textContent = `Player ${board[a]} Wins!`;
+      saveGame();
       return;
     }
   }
   if (!board.includes("")) {
     gameActive = false;
     if (turnDisplay) turnDisplay.textContent = "It's a Draw!";
+    saveGame();
   }
 };
 const handleMove = (index, button) => {
   if (!gameActive || board[index] !== "") return;
   board[index] = currentPlayer;
   button.textContent = currentPlayer;
-  button.classList.remove("hover-x", "hover-o");
   setTimeout(checkWinner, 50);
   if (gameActive) {
     currentPlayer = currentPlayer === "X" ? "O" : "X";
     if (turnDisplay) turnDisplay.textContent = `Current Player: ${currentPlayer}`;
   }
+  saveGame();
 };
 boxes.forEach((box, index) => {
-  box.addEventListener("click", () => handleMove(index, box));
   box.addEventListener("mouseenter", () => {
-    if (gameActive && board[index] === "") {
-      box.classList.add(currentPlayer === "X" ? "hover-x" : "hover-o");
+    if (!board[index]) {
+      box.textContent = currentPlayer;
+      box.style.opacity = "0.5";
     }
   });
   box.addEventListener("mouseleave", () => {
-    box.classList.remove("hover-x", "hover-o");
+    if (!board[index]) {
+      box.textContent = "";
+      box.style.opacity = "1";
+    }
   });
+  box.addEventListener("click", () => handleMove(index, box));
 });
 const resetGame = () => {
   board = Array(9).fill("");
@@ -56,9 +81,11 @@ const resetGame = () => {
   currentPlayer = "X";
   boxes.forEach((box) => {
     box.textContent = "";
-    box.classList.remove("hover-x", "hover-o");
+    box.style.opacity = "1";
   });
   if (turnDisplay) turnDisplay.textContent = `Current Player: ${currentPlayer}`;
+  localStorage.removeItem("ticTacToeGame");
 };
 reset?.addEventListener("click", resetGame);
+loadGame();
 //# sourceMappingURL=main.js.map

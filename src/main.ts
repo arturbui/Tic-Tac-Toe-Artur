@@ -6,7 +6,29 @@ let currentPlayer: string = "X";
 let gameActive: boolean = true;
 let board: string[] = Array(9).fill("");
 
-if (turnDisplay) turnDisplay.textContent = `Current Player: ${currentPlayer}`;
+const loadGame = () => {
+    const savedState = localStorage.getItem("ticTacToeGame");
+    if (savedState) {
+        const { savedBoard, savedPlayer, savedGameActive } = JSON.parse(savedState);
+        board = savedBoard;
+        currentPlayer = savedPlayer;
+        gameActive = savedGameActive;
+
+        board.forEach((mark, index) => {
+            boxes[index].textContent = mark;
+        });
+
+        if (turnDisplay) turnDisplay.textContent = `Current Player: ${currentPlayer}`;
+    }
+};
+
+const saveGame = () => {
+    localStorage.setItem("ticTacToeGame", JSON.stringify({
+        savedBoard: board,
+        savedPlayer: currentPlayer,
+        savedGameActive: gameActive
+    }));
+};
 
 const winningComb = [
     [0, 1, 2], [3, 4, 5], [6, 7, 8],
@@ -19,6 +41,7 @@ const checkWinner = () => {
         if (board[a] && board[a] === board[b] && board[a] === board[c]) {
             gameActive = false;
             if (turnDisplay) turnDisplay.textContent = `Player ${board[a]} Wins!`;
+            saveGame();
             return;
         }
     }
@@ -26,6 +49,7 @@ const checkWinner = () => {
     if (!board.includes("")) {
         gameActive = false;
         if (turnDisplay) turnDisplay.textContent = "It's a Draw!";
+        saveGame();
     }
 };
 
@@ -34,7 +58,6 @@ const handleMove = (index: number, button: HTMLButtonElement) => {
 
     board[index] = currentPlayer;
     button.textContent = currentPlayer;
-    button.classList.remove("hover-x", "hover-o"); // Remove hover class after move
 
     setTimeout(checkWinner, 50);
 
@@ -42,21 +65,28 @@ const handleMove = (index: number, button: HTMLButtonElement) => {
         currentPlayer = currentPlayer === "X" ? "O" : "X";
         if (turnDisplay) turnDisplay.textContent = `Current Player: ${currentPlayer}`;
     }
+
+    saveGame();
 };
 
-// Hover effect for previewing the next move
 boxes.forEach((box, index) => {
-    box.addEventListener("click", () => handleMove(index, box));
-
     box.addEventListener("mouseenter", () => {
-        if (gameActive && board[index] === "") {
-            box.classList.add(currentPlayer === "X" ? "hover-x" : "hover-o");
+        if (!board[index]) {
+            box.textContent = currentPlayer;
+            box.style.opacity = "0.5";
         }
     });
 
+    // Remove hover effect when mouse leaves
     box.addEventListener("mouseleave", () => {
-        box.classList.remove("hover-x", "hover-o");
+        if (!board[index]) {
+            box.textContent = "";
+            box.style.opacity = "1";
+        }
     });
+
+    // Handle Click Event
+    box.addEventListener("click", () => handleMove(index, box));
 });
 
 const resetGame = () => {
@@ -66,10 +96,14 @@ const resetGame = () => {
 
     boxes.forEach((box) => {
         box.textContent = "";
-        box.classList.remove("hover-x", "hover-o"); // Clear hover effects
+        box.style.opacity = "1";
     });
 
     if (turnDisplay) turnDisplay.textContent = `Current Player: ${currentPlayer}`;
+
+    localStorage.removeItem("ticTacToeGame");
 };
 
 reset?.addEventListener("click", resetGame);
+
+loadGame();
